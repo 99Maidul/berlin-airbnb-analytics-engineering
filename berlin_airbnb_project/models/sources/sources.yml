@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: staging
+    database: AIRBNB_BERLIN
+    schema: STAGING
+    tables:
+      - name: raw_listings
+      - name: raw_neighbourhoods
+      - name: raw_reviews
+      - name: raw_reviews_all

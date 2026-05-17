@@ -1,0 +1,14 @@
+models:
+  - name: bronze_listings
+    config:
+      materialized: table
+  - name: bronze_neigbourhoods
+    config:
+      materialized: table
+  - name: bronze_reviews_all
+    config:
+      materialized: table
+  - name: bronze_reviews
+    config:
+      materialized: table
+      

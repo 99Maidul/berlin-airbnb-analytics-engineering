@@ -1,10 +1,38 @@
-# Python-generated files
+```gitignore
+# Python
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.pyc
+.venv/
+env/
 
-# Virtual environments
-.venv
+# dbt
+target/
+dbt_packages/
+logs/
+
+# Snowflake / dbt profiles
+profiles.yml
+*.user.yml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Power BI cache
+*.pbix.autorecover
+
+# dbt docs static site
+catalog.json
+manifest.json
+partial_parse.msgpack
+run_results.json
+
+# Mac/Linux
+*.swp
+```

@@ -1,0 +1,70 @@
+version: 2
+
+models:
+
+  - name: dim_listings
+    description: Dimension table for Airbnb listings
+
+    columns:
+
+      - name: listing_id
+        tests:
+          - not_null
+          - unique
+
+      - name: host_id
+        tests:
+          - not_null
+
+      - name: property_type
+        tests:
+          - not_null
+
+  - name: dim_hosts
+    description: Dimension table for Airbnb hosts
+
+    columns:
+
+      - name: host_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_neighbourhoods
+    description: Dimension table for Berlin neighbourhoods
+
+    columns:
+
+      - name: neighbourhood_key
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_reviews
+    description: Fact table for Airbnb reviews
+
+    columns:
+
+      - name: review_id
+        tests:
+          - not_null
+
+      - name: listing_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_listings')
+              field: listing_id
+
+  - name: mart_listing_performance_obt
+    description: One Big Table for Airbnb listing performance analytics
+
+    columns:
+
+      - name: listing_id
+        tests:
+          - not_null
+
+      - name: host_id
+        tests:
+          - not_null
