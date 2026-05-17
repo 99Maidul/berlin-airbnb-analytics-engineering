@@ -357,6 +357,7 @@ This project explores business questions such as:
 # 📚 Dataset
 
 Dataset: Berlin Airbnb Open Data (Kaggle)
+https://www.kaggle.com/datasets/mahmoudkhater99/berlin-airbnb-dataset
 
 Includes:
 
