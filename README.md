@@ -1,404 +1,174 @@
 # Berlin Airbnb Analytics Engineering Pipeline
 
-## 📋 Overview
-
-This project implements an end-to-end analytics engineering pipeline for Airbnb listings and reviews data from Berlin using Snowflake, dbt, AWS S3, and Power BI.
-
-The pipeline follows a modern medallion architecture (**Bronze → Silver → Gold**) and demonstrates analytics engineering best practices including:
-
-* Incremental loading
-* Dimensional modeling (Star Schema)
-* One Big Table (OBT) modeling
-* Ephemeral models
-* Snapshots (SCD Type 2)
-* Data quality testing
-* Interactive BI dashboards
-* dbt lineage tracking
-
-The project uses the Berlin Airbnb dataset from Kaggle and transforms raw CSV files into analytics-ready datasets for business intelligence and reporting.
+End-to-end analytics engineering project analyzing Berlin Airbnb market performance across ~14K listings.  
+Built with **AWS S3, Snowflake, dbt, and Power BI**, using medallion architecture, dimensional modeling, snapshots, incremental models, and dbt tests.
 
 ---
 
-# 🏗️ Architecture
+## 🔑 Key Findings
 
-## Data Flow
+- **Mitte leads Berlin's Airbnb market** with approximately **€67M estimated annual revenue**.
+- **Friedrichshain-Kreuzberg and Pankow** are the next strongest neighbourhood groups by estimated revenue.
+- **Entire home/apartment listings dominate supply**, representing around **66% of total listings**.
+- **Hotel rooms command the highest average price** at around **€309**, compared with private rooms at around **€88**.
+- **Superhosts have higher average ratings** than non-superhosts, but do not necessarily charge the highest average prices.
+- The Berlin Airbnb market shows an estimated **66% occupancy proxy** across the analyzed listings.
+
+---
+
+## 🏗️ Architecture
 
 ```text
 Berlin Airbnb CSV Dataset
         ↓
 AWS S3
         ↓
-Snowflake Staging Layer
+Snowflake Staging Tables
         ↓
 dbt Bronze Layer
         ↓
 dbt Silver Layer
         ↓
-Ephemeral / Intermediate Models
+dbt Ephemeral / Intermediate Models
         ↓
-Gold Layer (Star Schema + OBT)
+dbt Gold Layer: Star Schema + OBT
         ↓
 Power BI Dashboard
-```
+````
 
 ---
 
-# 🛠️ Technology Stack
+## 🛠️ Tech Stack
 
-| Category                 | Technology             |
-| ------------------------ | ---------------------- |
-| Cloud Storage            | AWS S3                 |
-| Cloud Data Warehouse     | Snowflake              |
-| Transformation Framework | dbt                    |
-| BI & Visualization       | Power BI               |
-| Language                 | SQL + Jinja            |
-| Version Control          | Git & GitHub           |
-| Data Modeling            | Star Schema            |
-| Data Architecture        | Medallion Architecture |
-
----
-
-# 📊 Key Features
-
-## ✅ Medallion Architecture
-
-The project follows a layered architecture:
-
-### 🥉 Bronze Layer
-
-Raw ingestion with minimal transformations.
-
-### 🥈 Silver Layer
-
-Cleaned, standardized, and business-ready transformations.
-
-### 🥇 Gold Layer
-
-Analytics-ready dimensional models and marts optimized for BI consumption.
+| Layer           | Tool                        |
+| --------------- | --------------------------- |
+| Cloud Storage   | AWS S3                      |
+| Data Warehouse  | Snowflake                   |
+| Transformation  | dbt                         |
+| BI / Dashboard  | Power BI                    |
+| Modeling        | Star Schema + One Big Table |
+| Data Quality    | dbt Tests                   |
+| Version Control | GitHub                      |
 
 ---
 
-## ✅ Incremental Models
+## 📊 Dashboard Preview
 
-Incremental loading was implemented in bronze and silver models to process only new records efficiently.
+### Executive Overview
 
-Example:
+<img src="images/executive_overview.png" width="900">
 
-```sql
-{{ config(materialized='incremental') }}
-```
+### Host & Review Analytics
 
----
+<img src="images/host_review_analytics.png" width="900">
 
-## ✅ Star Schema Modeling
+### Pricing & Occupancy
 
-The gold layer includes:
-
-### Dimension Tables
-
-* `dim_listings`
-* `dim_hosts`
-* `dim_neighbourhoods`
-
-### Fact Table
-
-* `fct_reviews`
-
-### Analytics Mart
-
-* `mart_listing_performance_obt`
+<img src="images/pricing_occupancy.png" width="900">
 
 ---
 
-## ✅ Ephemeral Models
+## 🔄 dbt Lineage
 
-Reusable intermediate transformation logic was implemented using dbt ephemeral models:
+The dbt lineage graph tracks the full transformation flow from raw Snowflake sources through bronze, silver, intermediate, gold, snapshots, and the final Power BI mart.
 
-* `int_hosts`
-* `int_review_activity`
-* `int_review_text`
-
-These models reduce warehouse clutter while improving modularity.
+<img src="images/dbt_lineage.png" width="900">
 
 ---
 
-## ✅ Snapshots (SCD Type 2)
-
-Snapshots track historical changes in:
-
-* listings
-* host attributes
-
-Implemented using dbt snapshots:
-
-* `snap_listings`
-* `snap_hosts`
-
----
-
-## ✅ Data Quality Testing
-
-Implemented dbt tests including:
-
-* `not_null`
-* `unique`
-* `relationships`
-
-All tests successfully passed.
-
----
-
-# 📁 Project Structure
+## 📁 Project Structure
 
 ```text
 berlin_airbnb_project/
 │
 ├── models/
 │   ├── bronze/
-│   │   ├── bronze_listings.sql
-│   │   ├── bronze_reviews.sql
-│   │   ├── bronze_reviews_all.sql
-│   │   └── bronze_neighbourhoods.sql
-│   │
 │   ├── silver/
-│   │   ├── silver_listings.sql
-│   │   ├── silver_reviews.sql
-│   │   ├── silver_reviews_all.sql
-│   │   └── silver_neighbourhoods.sql
-│   │
 │   ├── ephemeral/
-│   │   ├── int_hosts.sql
-│   │   ├── int_review_activity.sql
-│   │   └── int_review_text.sql
-│   │
 │   ├── gold/
-│   │   ├── dim_hosts.sql
-│   │   ├── dim_listings.sql
-│   │   ├── dim_neighbourhoods.sql
-│   │   ├── fct_reviews.sql
-│   │   └── mart_listing_performance_obt.sql
-│   │
 │   └── sources/
-│       └── sources.yml
 │
 ├── snapshots/
-│   ├── snap_hosts.sql
-│   └── snap_listings.sql
-│
 ├── tests/
-│
-├── seeds/
-│
-├── analyses/
-│
-├── macros/
-│
-├── dbt_project.yml
-│
+├── DDL/
+├── images/
 └── README.md
 ```
 
 ---
 
-# 📈 Data Modeling
+## 🧱 Data Models
 
-## Gold Layer Design
+### Bronze Layer
 
-### Star Schema
+Raw Airbnb data loaded from Snowflake staging tables with light cleaning and type casting.
 
-The warehouse was modeled using a dimensional approach:
+### Silver Layer
+
+Cleaned and standardized listing, review, and neighbourhood models.
+
+### Ephemeral Models
+
+Reusable intermediate models for host deduplication, review activity, and review text aggregation.
+
+### Gold Layer
+
+Analytics-ready dimensional models and mart tables:
+
+* `dim_listings`
+* `dim_hosts`
+* `dim_neighbourhoods`
+* `fct_reviews`
+* `mart_listing_performance_obt`
+
+The final Power BI report uses `mart_listing_performance_obt`.
+
+---
+
+## ✅ Data Quality
+
+Implemented dbt tests for:
+
+* Primary key uniqueness
+* Not-null checks
+* Relationship integrity between fact and dimension tables
+
+Result:
 
 ```text
-dim_hosts
-dim_listings
-dim_neighbourhoods
-        ↓
-    fct_reviews
+13 tests passed
+0 errors
 ```
 
 ---
 
-## One Big Table (OBT)
-
-A denormalized analytics mart was created:
-
-```text
-mart_listing_performance_obt
-```
-
-The OBT combines:
-
-* listings
-* hosts
-* neighbourhoods
-* review metrics
-* occupancy metrics
-* revenue metrics
-
-This model was used directly in Power BI for dashboarding.
-
----
-
-# 📊 Power BI Dashboard
-
-The Power BI dashboard includes 3 analytics pages:
-
-## 1. Executive Overview
-
-* Revenue by neighbourhood
-* Listings by room type
-* Price segment distribution
-* KPI metrics
-
-![Executive Overview](images/executive_overview.png)
-
-## 2. Host & Review Analytics
-
-* Superhost performance analysis
-* Review trends
-* Ratings by neighbourhood
-* Top reviewed listings
-
-![Host & Review Analytics](images/host_review_analytics.png)
-
-## 3. Pricing & Occupancy
-
-* Price vs revenue analysis
-* Occupancy proxy analysis
-* Revenue segmentation
-* Top performing listings
-
-![Pricing & Occupancy](images/pricing_occupancy.png)
----
-
-# 🔄 dbt Lineage Graph
-
-The project includes full dbt lineage tracking across:
-
-* sources
-* bronze
-* silver
-* intermediate
-* marts
-* snapshots
-
-This improves:
-
-* traceability
-* maintainability
-* dependency management
-
-![dbt Lineage](images/dbt_lineage.png)
----
-
-# 🧪 Running the Project
-
-## Install dbt
-
-```bash
-pip install dbt-core dbt-snowflake
-```
-
----
-
-## Test Snowflake Connection
+## 🚀 How to Run
 
 ```bash
 dbt debug
-```
-
----
-
-## Run Models
-
-```bash
 dbt run
-```
-
----
-
-## Run Tests
-
-```bash
 dbt test
-```
-
----
-
-## Run Snapshots
-
-```bash
 dbt snapshot
-```
-
----
-
-## Generate Documentation
-
-```bash
 dbt docs generate
 dbt docs serve
 ```
 
 ---
 
-# 📌 Business Questions Answered
+## 📌 Business Questions Answered
 
-This project explores business questions such as:
-
-* Which Berlin neighbourhoods generate the highest estimated revenue?
-* Do superhosts outperform regular hosts?
-* Which room types maximize occupancy?
-* How does pricing affect occupancy and revenue?
-* Which market segments dominate Berlin Airbnb listings?
+* Which Berlin neighbourhoods generate the most estimated Airbnb revenue?
+* Which room types dominate the Berlin short-term rental market?
+* Do superhosts perform better than non-superhosts?
+* How do pricing segments relate to revenue and occupancy?
+* Which listings are the strongest performers by estimated annual revenue?
 
 ---
 
-# 📚 Dataset
+## 👤 Author
 
-Dataset: Berlin Airbnb Open Data (Kaggle)
-https://www.kaggle.com/datasets/mahmoudkhater99/berlin-airbnb-dataset
+**Maidul Islam**
 
-Includes:
+Analytics Engineering Portfolio Project
+Stack: **Snowflake, dbt, AWS S3, Power BI**
 
-* Listings
-* Reviews
-* Neighbourhoods
-
----
-
-# 🔐 Best Practices Implemented
-
-* Layered medallion architecture
-* Modular dbt transformations
-* Incremental processing
-* Dimensional modeling
-* Snapshot history tracking
-* Data quality testing
-* Reusable SQL logic
-* Analytics-ready marts
-
----
-
-# 🚀 Future Improvements
-
-* Airflow orchestration
-* CI/CD pipeline
-* Automated data quality monitoring
-* Real-time ingestion
-* Advanced Power BI analytics
-* dbt exposures & semantic layer
-* Snowflake performance optimization
-
----
-
-# 👤 Author
-
-Maidul Islam
-
-Analytics Engineering Project using:
-
-* Snowflake
-* dbt
-* AWS S3
-* Power BI
